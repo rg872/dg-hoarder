@@ -1,7 +1,7 @@
 {
-  "name": "secure-electron-template",
-  "version": "16.1.0",
-  "description": "The best way to build Electron apps with security in mind.",
+  "name": "dg-hoarder",
+  "version": "0.0.0",
+  "description": "Browse, download, organize and play your media files",
   "private": true,
   "main": "app/electron/main.js",
   "scripts": {
@@ -21,8 +21,8 @@
     "test": "mocha"
   },
   "build": {
-    "productName": "YourProductName",
-    "appId": "com.yourcompany|electron.yourproductname",
+    "productName": "DG Hoarder",
+    "appId": "com.electron.dghoarder",
     "directories": {
       "buildResources": "resources"
     },
@@ -54,26 +54,22 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/reZach/secure-electron-template.git"
+    "url": "git+https://github.com/rg872/dg-hoarder"
   },
   "keywords": [
     "electron",
-    "security",
-    "secure",
-    "template",
-    "javascript",
-    "react",
-    "redux",
-    "webpack",
-    "i18n",
-    "boilerplate"
+    "media",
+    "browse",
+    "download",
+    "organize",
+    "play"
   ],
-  "author": "reZach",
+  "author": "rg872",
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/reZach/secure-electron-template/issues"
+    "url": "https://github.com/rg872/dg-hoarder/issues"
   },
-  "homepage": "https://github.com/reZach/secure-electron-template#readme",
+  "homepage": "https://github.com/rg872/dg-hoarder#readme",
   "browserslist": [
     "last 2 Chrome versions"
   ],
