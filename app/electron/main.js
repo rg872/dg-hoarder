@@ -4,12 +4,12 @@ const {
   BrowserWindow,
   session,
   ipcMain,
-  Menu
+  Menu,
 } = require("electron");
 const {
   default: installExtension,
   REDUX_DEVTOOLS,
-  REACT_DEVELOPER_TOOLS
+  REACT_DEVELOPER_TOOLS,
 } = require("electron-devtools-installer");
 const SecureElectronLicenseKeys = require("secure-electron-license-keys");
 const Protocol = require("./protocol");
@@ -31,7 +31,6 @@ let win;
 let menuBuilder;
 
 async function createWindow() {
-
   // If you'd like to set up auto-updating for your app,
   // I'd recommend looking at https://github.com/iffy/electron-updater-example
   // to use the method most suitable for you.
@@ -40,11 +39,14 @@ async function createWindow() {
   if (!isDev) {
     // Needs to happen before creating/loading the browser window;
     // protocol is only used in prod
-    protocol.registerBufferProtocol(Protocol.scheme, Protocol.requestHandler); /* eng-disable PROTOCOL_HANDLER_JS_CHECK */
+    protocol.registerBufferProtocol(
+      Protocol.scheme,
+      Protocol.requestHandler
+    ); /* eng-disable PROTOCOL_HANDLER_JS_CHECK */
   }
 
   const store = new Store({
-    path: app.getPath("userData")
+    path: app.getPath("userData"),
   });
 
   // Use saved config values for configuring your
@@ -68,8 +70,8 @@ async function createWindow() {
       additionalArguments: [`storePath:${app.getPath("userData")}`],
       preload: path.join(__dirname, "preload.js"),
       /* eng-disable PRELOAD_JS_CHECK */
-      disableBlinkFeatures: "Auxclick"
-    }
+      disableBlinkFeatures: "Auxclick",
+    },
   });
 
   // Sets up main.js bindings for our i18next backend
@@ -78,7 +80,9 @@ async function createWindow() {
   // Sets up main.js bindings for our electron store;
   // callback is optional and allows you to use store in main process
   const callback = function (success, initialStore) {
-    console.log(`${!success ? "Un-s" : "S"}uccessfully retrieved store in main process.`);
+    console.log(
+      `${!success ? "Un-s" : "S"}uccessfully retrieved store in main process.`
+    );
     console.log(initialStore); // {"key1": "value1", ... }
   };
 
@@ -86,20 +90,24 @@ async function createWindow() {
 
   // Sets up bindings for our custom context menu
   ContextMenu.mainBindings(ipcMain, win, Menu, isDev, {
-    "loudAlertTemplate": [{
-      id: "loudAlert",
-      label: "AN ALERT!"
-    }],
-    "softAlertTemplate": [{
-      id: "softAlert",
-      label: "Soft alert"
-    }]
+    loudAlertTemplate: [
+      {
+        id: "loudAlert",
+        label: "AN ALERT!",
+      },
+    ],
+    softAlertTemplate: [
+      {
+        id: "softAlert",
+        label: "Soft alert",
+      },
+    ],
   });
 
   // Setup bindings for offline license verification
   SecureElectronLicenseKeys.mainBindings(ipcMain, win, fs, crypto, {
     root: process.cwd(),
-    version: app.getVersion()
+    version: app.getVersion(),
   });
 
   // Load app
@@ -110,12 +118,11 @@ async function createWindow() {
   }
 
   win.webContents.on("did-finish-load", () => {
-    win.setTitle(`Getting started with secure-electron-template (v${app.getVersion()})`);
+    win.setTitle("DG Hoarder - File Hoarder Manager");
   });
 
   // Only do these things when in development
   if (isDev) {
-
     // Errors are thrown if the dev tools are opened
     // before the DOM is ready
     win.webContents.once("dom-ready", async () => {
@@ -140,7 +147,10 @@ async function createWindow() {
   // https://electronjs.org/docs/tutorial/security#4-handle-session-permission-requests-from-remote-content
   const ses = session;
   const partition = "default";
-  ses.fromPartition(partition) /* eng-disable PERMISSION_REQUEST_HANDLER_JS_CHECK */
+  ses
+    .fromPartition(
+      partition
+    ) /* eng-disable PERMISSION_REQUEST_HANDLER_JS_CHECK */
     .setPermissionRequestHandler((webContents, permission, permCallback) => {
       const allowedPermissions = []; // Full list here: https://developer.chrome.com/extensions/declare_permissions#manifest
 
@@ -167,22 +177,22 @@ async function createWindow() {
   // });
 
   menuBuilder = MenuBuilder(win, app.name);
-  
+
   // Set up necessary bindings to update the menu items
   // based on the current language selected
-  i18nextMainBackend.on("initialized", (loaded) => {            
+  i18nextMainBackend.on("initialized", (loaded) => {
     i18nextMainBackend.changeLanguage("en");
-    i18nextMainBackend.off("initialized"); // Remove listener to this event as it's not needed anymore   
+    i18nextMainBackend.off("initialized"); // Remove listener to this event as it's not needed anymore
   });
 
   // When the i18n framework starts up, this event is called
   // (presumably when the default language is initialized)
-  // BEFORE the "initialized" event is fired - this causes an 
+  // BEFORE the "initialized" event is fired - this causes an
   // error in the logs. To prevent said error, we only call the
   // below code until AFTER the i18n framework has finished its
   // "initialized" event.
-  i18nextMainBackend.on("languageChanged", (lng) => {    
-    if (i18nextMainBackend.isInitialized){
+  i18nextMainBackend.on("languageChanged", (lng) => {
+    if (i18nextMainBackend.isInitialized) {
       menuBuilder.buildMenu(i18nextMainBackend);
     }
   });
@@ -192,13 +202,15 @@ async function createWindow() {
 // gives our scheme access to load relative files,
 // as well as local storage, cookies, etc.
 // https://electronjs.org/docs/api/protocol#protocolregisterschemesasprivilegedcustomschemes
-protocol.registerSchemesAsPrivileged([{
-  scheme: Protocol.scheme,
-  privileges: {
-    standard: true,
-    secure: true
-  }
-}]);
+protocol.registerSchemesAsPrivileged([
+  {
+    scheme: Protocol.scheme,
+    privileges: {
+      standard: true,
+      secure: true,
+    },
+  },
+]);
 
 // This method will be called when Electron has finished
 // initialization and is ready to create browser windows.
@@ -258,21 +270,22 @@ app.on("web-contents-created", (event, contents) => {
   });
 
   // https://electronjs.org/docs/tutorial/security#11-verify-webview-options-before-creation
-  contents.on("will-attach-webview", (contentsEvent, webPreferences, params) => {
-    // Strip away preload scripts if unused or verify their location is legitimate
-    delete webPreferences.preload;
-    delete webPreferences.preloadURL;
+  contents.on(
+    "will-attach-webview",
+    (contentsEvent, webPreferences, params) => {
+      // Strip away preload scripts if unused or verify their location is legitimate
+      delete webPreferences.preload;
+      delete webPreferences.preloadURL;
 
-    // Disable Node.js integration
-    webPreferences.nodeIntegration = false;
-  });
+      // Disable Node.js integration
+      webPreferences.nodeIntegration = false;
+    }
+  );
 
   // https://electronjs.org/docs/tutorial/security#13-disable-or-limit-creation-of-new-windows
   // This code replaces the old "new-window" event handling;
   // https://github.com/electron/electron/pull/24517#issue-447670981
-  contents.setWindowOpenHandler(({
-    url
-  }) => {
+  contents.setWindowOpenHandler(({ url }) => {
     const parsedUrl = new URL(url);
     const validOrigins = [];
 
@@ -283,12 +296,12 @@ app.on("web-contents-created", (event, contents) => {
       );
 
       return {
-        action: "deny"
+        action: "deny",
       };
     }
 
     return {
-      action: "allow"
+      action: "allow",
     };
   });
 });

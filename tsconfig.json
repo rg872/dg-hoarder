@@ -23,7 +23,17 @@
     /* Module Resolution Options */
     "moduleResolution": "node",
     "forceConsistentCasingInFileNames": true,
-    "esModuleInterop": true
+    "esModuleInterop": true,
+    "paths": {
+      "Constants/*": ["./app/src/constants/*"],
+      "Components/*": ["./app/src/components/*"],
+      "Core/*": ["./app/src/core/*"],
+      "Pages/*": ["./app/src/pages/*"],
+      "Redux/*": ["./app/src/redux/*"],
+      "I18n/*": ["./app/localization/*"],
+      "Types/*": ["./app/types/*"],
+      "*": ["./app/types/modules/*"]
+    }
   },
-  "include": ["app/src"]
-} 
+  "include": ["app/src", "app/types"]
+}
