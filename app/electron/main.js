@@ -25,6 +25,8 @@ const isDev = process.env.NODE_ENV === "development";
 const port = 40992; // Hardcoded; needs to match webpack.development.js and package.json
 const selfHost = `http://localhost:${port}`;
 
+const { fetchListListeners } = require("./handlers/fetchList.js");
+
 // Keep a global reference of the window object, if you don't, the window will
 // be closed automatically when the JavaScript object is garbage collected.
 let win;
@@ -215,7 +217,13 @@ protocol.registerSchemesAsPrivileged([
 // This method will be called when Electron has finished
 // initialization and is ready to create browser windows.
 // Some APIs can only be used after this event occurs.
-app.on("ready", createWindow);
+app.on("ready", () => {
+  // invoke ipc listeners
+  // dunno if listeners still work on macOS when app closed (not quit), can't test
+  fetchListListeners();
+
+  createWindow();
+});
 
 // Quit when all windows are closed.
 app.on("window-all-closed", () => {
