@@ -5,7 +5,7 @@ const Store = require("secure-electron-store").default;
 const ContextMenu = require("secure-electron-context-menu").default;
 const SecureElectronLicenseKeys = require("secure-electron-license-keys");
 
-const { fetchListEmitters } = require("./handlers/fetchlist");
+const { fetchListEmitters } = require("./handlers/fetchList");
 
 // Create the electron store to be made available in the renderer process
 const store = new Store();

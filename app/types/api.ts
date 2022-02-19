@@ -17,7 +17,7 @@ interface ILicenseKeys {
 
 interface IDownloadable {
   title: string;
-  detail_id: string;
+  id: string;
 }
 
 interface ITorrentLink {
@@ -41,13 +41,25 @@ interface ITorrent {
   age?: string;
 }
 
+interface ILegitTorrentParams {
+  category: "movie" | "music";
+  order: "seed" | "name" | "date";
+  by: "asc" | "desc";
+  pages: number;
+  search: string;
+}
+
 export interface IApi {
   i18nextElectronBackend: II18nextElectronBackend;
   store: any;
   contextMenu: any;
   licenseKeys: ILicenseKeys;
   fetchList: {
-    getPublicDomainMovies: () => Promise<IDownloadable[]>;
-    getPublicDomainMovieDetail: (detail_id: string) => Promise<ITorrent>;
+    getPublicDomainMovieList: () => Promise<IDownloadable[]>;
+    getPublicDomainMovieDetail: (id: string) => Promise<ITorrent>;
+    getLegitTorrentsList: (
+      params: ILegitTorrentParams
+    ) => Promise<IDownloadable[]>;
+    getLegitTorrentsDetail: (id: string) => Promise<ITorrent>;
   };
 }
