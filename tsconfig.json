@@ -31,9 +31,8 @@
       "Pages/*": ["./app/src/pages/*"],
       "Redux/*": ["./app/src/redux/*"],
       "I18n/*": ["./app/localization/*"],
-      "Types/*": ["./app/types/*"],
-      "*": ["./app/types/modules/*"]
+      "Types/*": ["./app/src/types/*"]
     }
   },
-  "include": ["app/src", "app/types"]
+  "include": ["app/src"]
 }

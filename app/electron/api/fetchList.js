@@ -1,6 +1,5 @@
 const axios = require("axios");
 const cheerio = require("cheerio");
-const { ipcMain, ipcRenderer } = require("electron");
 const errorHandler = require("./utils/error");
 
 const publicDomainMoviesUrl = "http://www.publicdomaintorrents.info";
@@ -192,66 +191,9 @@ async function getLegitTorrentsDetail(id) {
   }
 }
 
-// invoke all listener
-function fetchListListeners() {
-  ipcMain.handle(
-    "fetchlist/getPublicDomainMovieList",
-    getPublicDomainMovieList
-  );
-  ipcMain.handle("fetchlist/getPublicDomainMovieDetail", (_, id) =>
-    getPublicDomainMovieDetail(id)
-  );
-  ipcMain.handle("fetchlist/getLegitTorrentsList", (_, params) =>
-    getLegitTorrentsList(params)
-  );
-  ipcMain.handle("fetchlist/getLegitTorrentsDetail", (_, id) =>
-    getLegitTorrentsDetail(id)
-  );
-}
-
-const fetchListEmitters = {
-  getPublicDomainMovieList: async () => {
-    const { error, result } = await ipcRenderer.invoke(
-      "fetchlist/getPublicDomainMovieList"
-    );
-    if (error) {
-      throw new Error(error);
-    }
-    return result;
-  },
-  getPublicDomainMovieDetail: async (id) => {
-    const { error, result } = await ipcRenderer.invoke(
-      "fetchlist/getPublicDomainMovieDetail",
-      id
-    );
-    if (error) {
-      throw new Error(error);
-    }
-    return result;
-  },
-  getLegitTorrentsList: async (params) => {
-    const { error, result } = await ipcRenderer.invoke(
-      "fetchlist/getLegitTorrentsList",
-      params
-    );
-    if (error) {
-      throw new Error(error);
-    }
-    return result;
-  },
-  getLegitTorrentsDetail: async (id) => {
-    const { error, result } = await ipcRenderer.invoke(
-      "fetchlist/getLegitTorrentsDetail",
-      id
-    );
-    if (error) {
-      throw new Error(error);
-    }
-    return result;
-  },
-};
-
 module.exports = {
-  fetchListEmitters,
-  fetchListListeners,
+  getPublicDomainMovieList,
+  getPublicDomainMovieDetail,
+  getLegitTorrentsList,
+  getLegitTorrentsDetail,
 };

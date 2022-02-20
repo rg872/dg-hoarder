@@ -25,7 +25,7 @@ const isDev = process.env.NODE_ENV === "development";
 const port = 40992; // Hardcoded; needs to match webpack.development.js and package.json
 const selfHost = `http://localhost:${port}`;
 
-const { fetchListListeners } = require("./handlers/fetchList.js");
+const ipcListeners = require("./api/ipc/listeners");
 
 // Keep a global reference of the window object, if you don't, the window will
 // be closed automatically when the JavaScript object is garbage collected.
@@ -220,7 +220,7 @@ protocol.registerSchemesAsPrivileged([
 app.on("ready", () => {
   // invoke ipc listeners
   // dunno if listeners still work on macOS when app closed (not quit), can't test
-  fetchListListeners();
+  ipcListeners();
 
   createWindow();
 });

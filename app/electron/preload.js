@@ -5,7 +5,7 @@ const Store = require("secure-electron-store").default;
 const ContextMenu = require("secure-electron-context-menu").default;
 const SecureElectronLicenseKeys = require("secure-electron-license-keys");
 
-const { fetchListEmitters } = require("./handlers/fetchList");
+const { getMovieList, getMovieDetail } = require("./api/ipc/emitters");
 
 // Create the electron store to be made available in the renderer process
 const store = new Store();
@@ -17,5 +17,6 @@ contextBridge.exposeInMainWorld("api", {
   store: store.preloadBindings(ipcRenderer, fs),
   contextMenu: ContextMenu.preloadBindings(ipcRenderer),
   licenseKeys: SecureElectronLicenseKeys.preloadBindings(ipcRenderer),
-  fetchList: fetchListEmitters,
+  getMovieList,
+  getMovieDetail,
 });

@@ -1,4 +1,4 @@
-interface II18nextElectronBackend {
+interface I18nextElectronBackend {
   send: (b: any, c: any) => void;
   onReceive: (b: any, c: any) => void;
   onLanguageChange: (b: any) => void;
@@ -9,18 +9,20 @@ interface II18nextElectronBackend {
   };
 }
 
-interface ILicenseKeys {
+interface LicenseKeys {
   send: (b: any) => void;
   onReceive: (b: any, c: any) => void;
   clearRendererBindings: () => void;
 }
 
-interface IDownloadable {
+type provider = "public-domain-torrents" | "legit-torrents";
+
+interface Downloadable {
   title: string;
   id: string;
 }
 
-interface ITorrentLink {
+interface TorrentLink {
   label: string;
   url: string;
   size?: string;
@@ -29,9 +31,9 @@ interface ITorrentLink {
   uploaded_at?: string;
   age?: string;
 }
-interface ITorrent {
+interface Torrent {
   title: string;
-  link: string | ITorrentLink[];
+  link: string | TorrentLink[];
   desc?: string;
   // if link is an array, all properties below will be included in link array
   size?: string;
@@ -41,7 +43,7 @@ interface ITorrent {
   age?: string;
 }
 
-interface ILegitTorrentParams {
+interface LegitTorrentParams {
   category: "movie" | "music";
   order: "seed" | "name" | "date";
   by: "asc" | "desc";
@@ -49,17 +51,14 @@ interface ILegitTorrentParams {
   search: string;
 }
 
-export interface IApi {
-  i18nextElectronBackend: II18nextElectronBackend;
+export interface Api {
+  i18nextElectronBackend: I18nextElectronBackend;
   store: any;
   contextMenu: any;
-  licenseKeys: ILicenseKeys;
-  fetchList: {
-    getPublicDomainMovieList: () => Promise<IDownloadable[]>;
-    getPublicDomainMovieDetail: (id: string) => Promise<ITorrent>;
-    getLegitTorrentsList: (
-      params: ILegitTorrentParams
-    ) => Promise<IDownloadable[]>;
-    getLegitTorrentsDetail: (id: string) => Promise<ITorrent>;
-  };
+  licenseKeys: LicenseKeys;
+  getMovieList: (
+    provider: provider,
+    params?: LegitTorrentParams
+  ) => Promise<Downloadable[]>;
+  getMovieDetail: (provider: provider, id: string) => Promise<Torrent>;
 }
