@@ -1,10 +1,7 @@
 import React from "react";
 import ReactDOM from "react-dom";
 
-import "bulma/css/bulma.css";
-
 import { Api } from "Types/api";
-
 declare global {
   interface Window {
     api: Api;
