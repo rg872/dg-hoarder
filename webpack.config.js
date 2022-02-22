@@ -51,11 +51,25 @@ module.exports = {
       // loads .css files
       {
         test: /\.css$/,
-        include: [
-          path.resolve(__dirname, "app/src"),
-          path.resolve(__dirname, "node_modules/"),
-        ],
+        include: [path.resolve(__dirname, "node_modules/")],
         use: [MiniCssExtractPlugin.loader, "css-loader"],
+        resolve: {
+          extensions: [".css"],
+        },
+      },
+      // load css module
+      {
+        test: /\.css$/,
+        include: [path.resolve(__dirname, "app/src")],
+        use: [
+          MiniCssExtractPlugin.loader,
+          {
+            loader: "css-loader",
+            options: {
+              modules: true,
+            },
+          },
+        ],
         resolve: {
           extensions: [".css"],
         },
