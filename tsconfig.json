@@ -23,10 +23,7 @@
     /* Module Resolution Options */
     "moduleResolution": "node",
     "forceConsistentCasingInFileNames": true,
-    "esModuleInterop": true,
-    "paths": {
-      "Types/*": ["./app/src/types/*"]
-    }
+    "esModuleInterop": true
   },
   "include": ["app/src"]
 }

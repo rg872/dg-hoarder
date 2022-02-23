@@ -1,10 +1,11 @@
 import React from "react";
 import ReactDOM from "react-dom";
 
-import { Api } from "Types/api";
+import { Api } from "./types/api";
+
+import Root from "./core/root";
 
 import "@picocss/pico";
-import "./index.css";
 
 declare global {
   interface Window {
@@ -12,4 +13,9 @@ declare global {
   }
 }
 
-ReactDOM.render(<div>WOW</div>, document.getElementById("target"));
+ReactDOM.render(
+  <React.StrictMode>
+    <Root />
+  </React.StrictMode>,
+  document.getElementById("target")
+);

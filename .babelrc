@@ -3,10 +3,7 @@
     [
       "module-resolver",
       {
-        "cwd": "babelrc",
-        "alias": {
-          "Types": "./app/src/types"
-        }
+        "cwd": "babelrc"
       },
       "@babel/plugin-syntax-dynamic-import"
     ]
