@@ -1,6 +1,6 @@
 import React, { FunctionComponent } from "react";
 
-import Styles from "./download.css";
+import Styles from "./styles/download.css";
 
 const Download: FunctionComponent = () => {
   return <main className="container">Download</main>;

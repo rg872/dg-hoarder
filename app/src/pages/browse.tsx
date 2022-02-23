@@ -1,6 +1,6 @@
 import React, { FunctionComponent } from "react";
 
-import Styles from "./browse.css";
+import Styles from "./styles/browse.css";
 
 const Browse: FunctionComponent = () => {
   return <main className="container">BROWSE</main>;

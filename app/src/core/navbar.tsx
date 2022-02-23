@@ -1,7 +1,7 @@
 import React, { FunctionComponent } from "react";
 import { Link } from "react-router-dom";
 
-import Styles from "./navbar.css";
+import Styles from "./styles/navbar.css";
 
 const Navbar: FunctionComponent = () => {
   return (

@@ -4,7 +4,7 @@ import Navbar from "./navbar";
 
 import Pages from "./pages";
 
-import "./root.css";
+import "./styles/root.css";
 
 const Root: FunctionComponent = () => {
   return (
