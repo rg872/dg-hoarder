@@ -1,9 +1,4 @@
 const { app, protocol, BrowserWindow, session } = require("electron");
-const {
-  default: installExtension,
-  REDUX_DEVTOOLS,
-  REACT_DEVELOPER_TOOLS,
-} = require("electron-devtools-installer");
 const Protocol = require("./protocol");
 const path = require("path");
 const isDev = process.env.NODE_ENV === "development";
@@ -65,13 +60,8 @@ async function createWindow() {
     // Errors are thrown if the dev tools are opened
     // before the DOM is ready
     win.webContents.once("dom-ready", async () => {
-      await installExtension([REDUX_DEVTOOLS, REACT_DEVELOPER_TOOLS])
-        .then((name) => console.log(`Added Extension: ${name}`))
-        .catch((err) => console.log("An error occurred: ", err))
-        .finally(() => {
-          require("electron-debug")(); // https://github.com/sindresorhus/electron-debug
-          win.webContents.openDevTools();
-        });
+      require("electron-debug")(); // https://github.com/sindresorhus/electron-debug
+      win.webContents.openDevTools();
     });
   }
 

@@ -1,6 +1,6 @@
 export type Provider = "public-domain-torrents" | "legit-torrents";
 
-export interface Downloadable {
+export interface DiscoveredFile {
   id: string;
   title: string;
   provider: Provider;
@@ -16,7 +16,7 @@ export interface TorrentLink {
   age?: string;
 }
 
-export interface Torrent extends Downloadable {
+export interface TorrentFile extends DiscoveredFile {
   link: string | TorrentLink[];
   desc?: string;
   // if link is an array, all properties below will be included in link array

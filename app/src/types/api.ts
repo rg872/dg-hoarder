@@ -1,12 +1,12 @@
-import * as Discover from "./discover";
+import * as File from "./file";
 
 export interface Api {
   getMovieList: (
-    provider: Discover.Provider,
-    params?: Discover.LegitTorrentParams & { category: "movie" }
-  ) => Promise<Discover.Downloadable[]>;
+    provider: File.Provider,
+    params?: File.LegitTorrentParams & { category: "movie" }
+  ) => Promise<File.DiscoveredFile[]>;
   getMovieDetail: (
-    provider: Discover.Provider,
+    provider: File.Provider,
     id: string
-  ) => Promise<Discover.Torrent>;
+  ) => Promise<File.TorrentFile>;
 }
