@@ -1,17 +1,17 @@
 import React, { FunctionComponent } from "react";
-import { BrowserRouter } from "react-router-dom";
-import Navbar from "./navbar";
+import { HashRouter } from "react-router-dom";
 
+import Navbar from "./navbar";
 import Pages from "./pages";
 
 import "./styles/root.css";
 
 const Root: FunctionComponent = () => {
   return (
-    <BrowserRouter>
+    <HashRouter>
       <Navbar />
       <Pages />
-    </BrowserRouter>
+    </HashRouter>
   );
 };
 

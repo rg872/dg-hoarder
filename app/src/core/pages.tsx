@@ -1,27 +1,36 @@
 import React, { FunctionComponent, Suspense, lazy } from "react";
 import { Route, Routes } from "react-router-dom";
 
-import Loading from "../pages/loading";
+import PageLoading from "../pages/loading/page-loading";
 
-const Browse = lazy(
-  () => import(/* webpackChunkName: "browser.chunk" */ "../pages/browse")
+const PageBrowse = lazy(
+  () =>
+    import(
+      /* webpackChunkName: "browser.chunk" */ "../pages/browse/page-browse"
+    )
 );
 
-const Download = lazy(
-  () => import(/* webpackChunkName: "download.chunk" */ "../pages/download")
+const PageDownload = lazy(
+  () =>
+    import(
+      /* webpackChunkName: "download.chunk" */ "../pages/download/page-download"
+    )
 );
 
-const Organize = lazy(
-  () => import(/* webpackChunkName: "organize.chunk" */ "../pages/organize")
+const PageOrganize = lazy(
+  () =>
+    import(
+      /* webpackChunkName: "organize.chunk" */ "../pages/organize/page-organize"
+    )
 );
 
 const Pages: FunctionComponent = () => {
   return (
-    <Suspense fallback={<Loading />}>
+    <Suspense fallback={<PageLoading />}>
       <Routes>
-        <Route path="/" element={<Browse />} />
-        <Route path="/download" element={<Download />} />
-        <Route path="/organize" element={<Organize />} />
+        <Route path="/" element={<PageBrowse />} />
+        <Route path="/download" element={<PageDownload />} />
+        <Route path="/organize" element={<PageOrganize />} />
       </Routes>
     </Suspense>
   );

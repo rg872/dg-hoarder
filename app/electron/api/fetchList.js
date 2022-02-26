@@ -27,6 +27,7 @@ async function getPublicDomainMovieList() {
       result.push({
         title: $(detail_link_el).text().trim(),
         id: movie_id,
+        provider: "public-domain-torrents",
       });
     });
 
@@ -52,6 +53,8 @@ async function getPublicDomainMovieDetail(id) {
     const desc_che = $("h1+table tr:nth-child(3)>td:nth-child(2)");
     const dl_links_che = $('a[href*=".torrent"]');
 
+    result.id = `public-domain-torrents-${id}`;
+    result.provider = "public-domain-torrents";
     result.title = title_che.text().trim();
     result.desc = desc_che.text().trim();
 
@@ -141,6 +144,7 @@ async function getLegitTorrentsList(params = {}) {
       result.push({
         title: $(detail_link_el).text(),
         id: id,
+        provider: "legit-torrents",
       });
     });
 
@@ -162,6 +166,9 @@ async function getLegitTorrentsDetail(id) {
     );
     const $ = cheerio.load(page_html);
     const td_headers_che = $('div[align="center"]>table>tbody>tr>td.header');
+
+    result.id = `legit-torrents-${id}`;
+    result.provider = "legit-torrents";
 
     td_headers_che.each((_, td_header_el) => {
       const row_title = $(td_header_el).text().trim();
