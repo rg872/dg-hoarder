@@ -1,5 +1,5 @@
 import React, { FunctionComponent } from "react";
-import { NavLink } from "react-router-dom";
+import { Link } from "react-router-dom";
 
 import Styles from "./styles/navbar.css";
 
@@ -9,13 +9,13 @@ const Navbar: FunctionComponent = () => {
       <nav>
         <ul>
           <li>
-            <NavLink to="/">Browse</NavLink>
+            <Link to="/">Browse</Link>
           </li>
           <li>
-            <NavLink to="/download">Download</NavLink>
+            <Link to="download">Download</Link>
           </li>
           <li>
-            <NavLink to="/organize">Organize</NavLink>
+            <Link to="organize">Organize</Link>
           </li>
         </ul>
       </nav>
