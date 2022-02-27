@@ -1,4 +1,6 @@
-import React, { FunctionComponent } from "react";
+import React from "react";
+
+import type { FunctionComponent } from "react";
 
 import Styles from "./page-browse.css";
 

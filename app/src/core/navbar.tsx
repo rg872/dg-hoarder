@@ -1,5 +1,7 @@
-import React, { FunctionComponent } from "react";
+import React from "react";
 import { NavLink } from "react-router-dom";
+
+import type { FunctionComponent } from "react";
 
 import Styles from "./styles/navbar.css";
 

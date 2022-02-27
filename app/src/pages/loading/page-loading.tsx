@@ -1,6 +1,6 @@
-import React, { FunctionComponent } from "react";
+import React from "react";
 
-import Styles from "./page-loading.css";
+import type { FunctionComponent } from "react";
 
 const PageLoading: FunctionComponent = () => {
   return <main className="container">Loading...</main>;

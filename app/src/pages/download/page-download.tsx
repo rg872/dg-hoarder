@@ -1,6 +1,6 @@
-import React, { FunctionComponent } from "react";
+import React from "react";
 
-import Styles from "./page-download.css";
+import type { FunctionComponent } from "react";
 
 const PageDownload: FunctionComponent = () => {
   return <main className="container">Download</main>;

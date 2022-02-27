@@ -1,13 +1,13 @@
 const { ipcRenderer } = require("electron");
 
-async function getMovieList(provider, params) {
+async function getMovieList(providers, params) {
   const { error, result } = await ipcRenderer.invoke(
     "getMovieList",
-    provider,
+    providers,
     params
   );
-  if (error) {
-    throw new Error(error);
+  if (error && !result) {
+    throw new Error("Oops, something wrong happened when fetching movie list");
   }
   return result;
 }
@@ -19,7 +19,9 @@ async function getMovieDetail(provider, id) {
     id
   );
   if (error) {
-    throw new Error(error);
+    throw new Error(
+      "Oops, something wrong happened when fetching movie detail"
+    );
   }
   return result;
 }

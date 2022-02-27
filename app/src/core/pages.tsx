@@ -1,5 +1,7 @@
-import React, { FunctionComponent, Suspense, lazy } from "react";
+import React, { Suspense, lazy } from "react";
 import { Route, Routes } from "react-router-dom";
+
+import type { FunctionComponent } from "react";
 
 import PageLoading from "../pages/loading/page-loading";
 

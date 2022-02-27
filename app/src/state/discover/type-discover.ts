@@ -1,4 +1,4 @@
-export type Provider = "public-domain-torrents" | "legit-torrents";
+export type Provider = "Public Domain Torrents" | "Legit Torrents";
 
 export interface DiscoveredFile {
   id: string;
@@ -12,7 +12,7 @@ export interface TorrentLink {
   size?: string;
   seeds?: number;
   peers?: number;
-  uploaded_at?: string;
+  uploadedAt?: string;
   age?: string;
 }
 
@@ -23,11 +23,11 @@ export interface TorrentFile extends DiscoveredFile {
   size?: string;
   seeds?: number;
   peers?: number;
-  uploaded_at?: string;
+  uploadedAt?: string;
   age?: string;
 }
 
-export interface LegitTorrentParams {
+export interface DiscoverParams {
   category: "movie" | "music";
   order: "seed" | "name" | "date";
   by: "asc" | "desc";

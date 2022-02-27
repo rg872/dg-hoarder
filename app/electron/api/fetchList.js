@@ -2,32 +2,32 @@ const axios = require("axios");
 const cheerio = require("cheerio");
 const errorHandler = require("./utils/error");
 
-const public_domain_movies_url = "http://www.publicdomaintorrents.info";
-const leggit_torrents_url = "http://www.legittorrents.info";
+const publicDomainMoviesUrl = "http://www.publicdomaintorrents.info";
+const leggitTorrentsUrl = "http://www.legittorrents.info";
 
 async function getPublicDomainMovieList() {
   try {
     let result = [];
 
-    const { data: page_html } = await axios.get(
-      `${public_domain_movies_url}/nshowcat.html`,
+    const { data: pageHtml } = await axios.get(
+      `${publicDomainMoviesUrl}/nshowcat.html`,
       {
         params: { category: "ALL" },
       }
     );
 
-    const $ = cheerio.load(page_html);
-    const detail_links_che = $('a[href*="nshowmovie"]');
+    const $ = cheerio.load(pageHtml);
+    const detailLinksChe = $('a[href*="nshowmovie"]');
 
-    detail_links_che.each((_, detail_link_el) => {
-      const detail_url = new URL(
-        `${public_domain_movies_url}/${detail_link_el.attribs["href"]}`
+    detailLinksChe.each((_, detailLinkEl) => {
+      const detailUrl = new URL(
+        `${publicDomainMoviesUrl}/${detailLinkEl.attribs["href"]}`
       );
-      const movie_id = detail_url.searchParams.get("movieid");
+      const movieId = detailUrl.searchParams.get("movieid");
       result.push({
-        title: $(detail_link_el).text().trim(),
-        id: movie_id,
-        provider: "public-domain-torrents",
+        title: $(detailLinkEl).text().trim(),
+        id: movieId,
+        provider: "Public Domain Torrents",
       });
     });
 
@@ -44,28 +44,28 @@ async function getPublicDomainMovieDetail(id) {
     const result = {};
     result.link = [];
 
-    const { data: page_html } = await axios.get(
-      `${public_domain_movies_url}/nshowmovie.html`,
+    const { data: pageHtml } = await axios.get(
+      `${publicDomainMoviesUrl}/nshowmovie.html`,
       { params: { movieid: id } }
     );
-    const $ = cheerio.load(page_html);
-    const title_che = $("td>h3");
-    const desc_che = $("h1+table tr:nth-child(3)>td:nth-child(2)");
-    const dl_links_che = $('a[href*=".torrent"]');
+    const $ = cheerio.load(pageHtml);
+    const titleChe = $("td>h3");
+    const descChe = $("h1+table tr:nth-child(3)>td:nth-child(2)");
+    const dlLinksChe = $('a[href*=".torrent"]');
 
     result.id = `public-domain-torrents-${id}`;
-    result.provider = "public-domain-torrents";
-    result.title = title_che.text().trim();
-    result.desc = desc_che.text().trim();
+    result.provider = "Public Domain Torrents";
+    result.title = titleChe.text().trim();
+    result.desc = descChe.text().trim();
 
-    dl_links_che.each((i, dl_link_el) => {
+    dlLinksChe.each((i, dlLinkEl) => {
       result.link.push({
-        label: $(dl_link_el)
+        label: $(dlLinkEl)
           .text()
           .replace(/(\d{1,6}|\d[,.]\d{1,3})\s?(MB|GB)/, "")
           .trim(),
-        url: dl_link_el.attribs["href"],
-        size: $(dl_link_el)
+        url: dlLinkEl.attribs["href"],
+        size: $(dlLinkEl)
           .text()
           .match(/(\d{1,6}|\d[,.]\d{1,3})\s?(MB|GB)/)[0]
           .trim(),
@@ -123,28 +123,28 @@ async function getLegitTorrentsList(params = {}) {
     // this will also change 0 and below to "1"
     params.pages = params.pages ? String(params.pages) : "1";
 
-    const { data: page_html } = await axios.get(
-      `${leggit_torrents_url}/index.php`,
+    const { data: pageHtml } = await axios.get(
+      `${leggitTorrentsUrl}/index.php`,
       {
         params: { page: "torrents", active: "1", ...params },
       }
     );
 
-    const $ = cheerio.load(page_html);
-    const detail_links_che = $('a[href*="page=torrent-detail"]');
+    const $ = cheerio.load(pageHtml);
+    const detailLinksChe = $('a[href*="page=torrent-detail"]');
 
     // return empty array as result if no link found
-    if (!detail_links_che.length) return { result };
+    if (!detailLinksChe.length) return { result };
 
-    detail_links_che.each((_, detail_link_el) => {
-      const detail_url = new URL(
-        `${leggit_torrents_url}/${detail_link_el.attribs["href"]}`
+    detailLinksChe.each((_, detailLinkEl) => {
+      const detailUrl = new URL(
+        `${leggitTorrentsUrl}/${detailLinkEl.attribs["href"]}`
       );
-      const id = detail_url.searchParams.get("id");
+      const id = detailUrl.searchParams.get("id");
       result.push({
-        title: $(detail_link_el).text(),
+        title: $(detailLinkEl).text(),
         id: id,
-        provider: "legit-torrents",
+        provider: "Legit Torrents",
       });
     });
 
@@ -160,31 +160,31 @@ async function getLegitTorrentsDetail(id) {
 
     const result = {};
 
-    const { data: page_html } = await axios.get(
-      `${leggit_torrents_url}/index.php`,
+    const { data: pageHtml } = await axios.get(
+      `${leggitTorrentsUrl}/index.php`,
       { params: { page: "torrent-details", id } }
     );
-    const $ = cheerio.load(page_html);
-    const td_headers_che = $('div[align="center"]>table>tbody>tr>td.header');
+    const $ = cheerio.load(pageHtml);
+    const tdHeadersChe = $('div[align="center"]>table>tbody>tr>td.header');
 
     result.id = `legit-torrents-${id}`;
-    result.provider = "legit-torrents";
+    result.provider = "Legit Torrents";
 
-    td_headers_che.each((_, td_header_el) => {
-      const row_title = $(td_header_el).text().trim();
+    tdHeadersChe.each((_, tdHeaderEl) => {
+      const row_title = $(tdHeaderEl).text().trim();
       if (row_title === "Name") {
-        result.title = $(td_header_el).next().text();
+        result.title = $(tdHeaderEl).next().text();
       } else if (row_title === "Torrent") {
         result.link =
-          leggit_torrents_url +
+          leggitTorrentsUrl +
           "/" +
-          $(td_header_el).next().children().first().attr("href");
+          $(tdHeaderEl).next().children().first().attr("href");
       } else if (row_title === "Description") {
-        result.desc = $(td_header_el).next().text();
+        result.desc = $(tdHeaderEl).next().text();
       } else if (row_title === "Size") {
-        result.size = $(td_header_el).next().text();
+        result.size = $(tdHeaderEl).next().text();
       } else if (row_title === "AddDate") {
-        result.uploaded_at = $(td_header_el).next().text();
+        result.uploadedAt = $(tdHeaderEl).next().text();
       } else if (row_title === "peers") {
         // TODO: extract from seed and peers from text, too lazy right now
       }
