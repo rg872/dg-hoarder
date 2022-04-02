@@ -1,14 +1,19 @@
 import React from "react";
 import ReactDOM from "react-dom";
 
-import "bulma/css/bulma.css";
+import { Provider } from "react-redux";
+import store from "./state/store";
 
-import { IApi } from "Types/api";
+import Root from "./core/root";
 
-declare global {
-  interface Window {
-    api: IApi;
-  }
-}
+import "@picocss/pico";
+import "./index.css";
 
-ReactDOM.render(<div>HELLO</div>, document.getElementById("target"));
+ReactDOM.render(
+  <React.StrictMode>
+    <Provider store={store}>
+      <Root />
+    </Provider>
+  </React.StrictMode>,
+  document.getElementById("target")
+);

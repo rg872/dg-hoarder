@@ -1,34 +1,21 @@
-const {
-  app,
-  protocol,
-  BrowserWindow,
-  session,
-  ipcMain,
-  Menu,
-} = require("electron");
-const {
-  default: installExtension,
-  REDUX_DEVTOOLS,
-  REACT_DEVELOPER_TOOLS,
-} = require("electron-devtools-installer");
-const SecureElectronLicenseKeys = require("secure-electron-license-keys");
+const { app, protocol, BrowserWindow, session, ipcMain } = require("electron");
 const Protocol = require("./protocol");
-const MenuBuilder = require("./menu");
-const i18nextBackend = require("i18next-electron-fs-backend");
-const i18nextMainBackend = require("../localization/i18n.mainconfig");
-const Store = require("secure-electron-store").default;
-const ContextMenu = require("secure-electron-context-menu").default;
 const path = require("path");
-const fs = require("fs");
-const crypto = require("crypto");
 const isDev = process.env.NODE_ENV === "development";
 const port = 40992; // Hardcoded; needs to match webpack.development.js and package.json
 const selfHost = `http://localhost:${port}`;
 
+const ipcListeners = require("./ipc/listeners");
+const { setDefaultConfig } = require("./api/appConfig");
+const { openDB, closeDB } = require("./api/sqlite");
+const { initDownloadDeps } = require("./api/download");
+
 // Keep a global reference of the window object, if you don't, the window will
 // be closed automatically when the JavaScript object is garbage collected.
 let win;
-let menuBuilder;
+
+// main instance of torrentClient;
+let torrentClient;
 
 async function createWindow() {
   // If you'd like to set up auto-updating for your app,
@@ -45,21 +32,10 @@ async function createWindow() {
     ); /* eng-disable PROTOCOL_HANDLER_JS_CHECK */
   }
 
-  const store = new Store({
-    path: app.getPath("userData"),
-  });
-
-  // Use saved config values for configuring your
-  // BrowserWindow, for instance.
-  // NOTE - this config is not passcode protected
-  // and stores plaintext values
-  //let savedConfig = store.mainInitialStore(fs);
-
   // Create the browser window.
   win = new BrowserWindow({
     width: 800,
     height: 600,
-    title: "Application is currently initializing...",
     webPreferences: {
       devTools: isDev,
       nodeIntegration: false,
@@ -67,81 +43,44 @@ async function createWindow() {
       nodeIntegrationInSubFrames: false,
       contextIsolation: true,
       enableRemoteModule: false,
-      additionalArguments: [`storePath:${app.getPath("userData")}`],
       preload: path.join(__dirname, "preload.js"),
       /* eng-disable PRELOAD_JS_CHECK */
       disableBlinkFeatures: "Auxclick",
     },
   });
 
-  // Sets up main.js bindings for our i18next backend
-  i18nextBackend.mainBindings(ipcMain, win, fs);
-
-  // Sets up main.js bindings for our electron store;
-  // callback is optional and allows you to use store in main process
-  const callback = function (success, initialStore) {
-    console.log(
-      `${!success ? "Un-s" : "S"}uccessfully retrieved store in main process.`
-    );
-    console.log(initialStore); // {"key1": "value1", ... }
-  };
-
-  store.mainBindings(ipcMain, win, fs, callback);
-
-  // Sets up bindings for our custom context menu
-  ContextMenu.mainBindings(ipcMain, win, Menu, isDev, {
-    loudAlertTemplate: [
-      {
-        id: "loudAlert",
-        label: "AN ALERT!",
-      },
-    ],
-    softAlertTemplate: [
-      {
-        id: "softAlert",
-        label: "Soft alert",
-      },
-    ],
-  });
-
-  // Setup bindings for offline license verification
-  SecureElectronLicenseKeys.mainBindings(ipcMain, win, fs, crypto, {
-    root: process.cwd(),
-    version: app.getVersion(),
-  });
-
   // Load app
   if (isDev) {
     win.loadURL(selfHost);
+    win.maximize();
   } else {
     win.loadURL(`${Protocol.scheme}://rse/index.html`);
   }
-
-  win.webContents.on("did-finish-load", () => {
-    win.setTitle("DG Hoarder - File Hoarder Manager");
-  });
 
   // Only do these things when in development
   if (isDev) {
     // Errors are thrown if the dev tools are opened
     // before the DOM is ready
     win.webContents.once("dom-ready", async () => {
-      await installExtension([REDUX_DEVTOOLS, REACT_DEVELOPER_TOOLS])
-        .then((name) => console.log(`Added Extension: ${name}`))
-        .catch((err) => console.log("An error occurred: ", err))
-        .finally(() => {
-          require("electron-debug")(); // https://github.com/sindresorhus/electron-debug
-          win.webContents.openDevTools();
-        });
+      require("electron-debug")(); // https://github.com/sindresorhus/electron-debug
+      win.webContents.openDevTools();
     });
   }
 
+  // init downloadDeps and torrentClient
+  torrentClient = initDownloadDeps(win.webContents);
+
   // Emitted when the window is closed.
   win.on("closed", () => {
-    // Dereference the window object, usually you would store windows
-    // in an array if your app supports multi windows, this is the time
-    // when you should delete the corresponding element.
-    win = null;
+    // destroy torrentClient to stop event listener
+    torrentClient.destroy((err) => {
+      // TODO: add error handler and logger
+
+      // Dereference the window object, usually you would store windows
+      // in an array if your app supports multi windows, this is the time
+      // when you should delete the corresponding element.
+      win = null;
+    });
   });
 
   // https://electronjs.org/docs/tutorial/security#4-handle-session-permission-requests-from-remote-content
@@ -175,27 +114,6 @@ async function createWindow() {
   //     });
   //   }
   // });
-
-  menuBuilder = MenuBuilder(win, app.name);
-
-  // Set up necessary bindings to update the menu items
-  // based on the current language selected
-  i18nextMainBackend.on("initialized", (loaded) => {
-    i18nextMainBackend.changeLanguage("en");
-    i18nextMainBackend.off("initialized"); // Remove listener to this event as it's not needed anymore
-  });
-
-  // When the i18n framework starts up, this event is called
-  // (presumably when the default language is initialized)
-  // BEFORE the "initialized" event is fired - this causes an
-  // error in the logs. To prevent said error, we only call the
-  // below code until AFTER the i18n framework has finished its
-  // "initialized" event.
-  i18nextMainBackend.on("languageChanged", (lng) => {
-    if (i18nextMainBackend.isInitialized) {
-      menuBuilder.buildMenu(i18nextMainBackend);
-    }
-  });
 }
 
 // Needs to be called before app is ready;
@@ -215,18 +133,28 @@ protocol.registerSchemesAsPrivileged([
 // This method will be called when Electron has finished
 // initialization and is ready to create browser windows.
 // Some APIs can only be used after this event occurs.
-app.on("ready", createWindow);
+app.on("ready", () => {
+  // set default config
+  setDefaultConfig();
+
+  // open sqlite db
+  openDB();
+
+  // invoke ipc listeners
+  // dunno if listeners still work on macOS when app closed (not quit), can't test
+  ipcListeners();
+
+  // create new window
+  createWindow();
+});
 
 // Quit when all windows are closed.
-app.on("window-all-closed", () => {
+app.on("window-all-closed", async () => {
   // On macOS it is common for applications and their menu bar
   // to stay active until the user quits explicitly with Cmd + Q
   if (process.platform !== "darwin") {
+    await closeDB();
     app.quit();
-  } else {
-    i18nextBackend.clearMainBindings(ipcMain);
-    ContextMenu.clearMainBindings(ipcMain);
-    SecureElectronLicenseKeys.clearMainBindings(ipcMain);
   }
 });
 

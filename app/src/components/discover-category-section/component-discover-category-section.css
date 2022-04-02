@@ -1,0 +1,14 @@
+.title {
+  text-transform: capitalize;
+}
+
+.categoryContainer {
+  display: flex;
+  justify-content: flex-start;
+  gap: 40px;
+}
+
+.categoryCard {
+  margin: 0;
+  text-align: center;
+}

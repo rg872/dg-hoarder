@@ -23,17 +23,7 @@
     /* Module Resolution Options */
     "moduleResolution": "node",
     "forceConsistentCasingInFileNames": true,
-    "esModuleInterop": true,
-    "paths": {
-      "Constants/*": ["./app/src/constants/*"],
-      "Components/*": ["./app/src/components/*"],
-      "Core/*": ["./app/src/core/*"],
-      "Pages/*": ["./app/src/pages/*"],
-      "Redux/*": ["./app/src/redux/*"],
-      "I18n/*": ["./app/localization/*"],
-      "Types/*": ["./app/types/*"],
-      "*": ["./app/types/modules/*"]
-    }
+    "esModuleInterop": true
   },
-  "include": ["app/src", "app/types"]
+  "include": ["app/src"]
 }

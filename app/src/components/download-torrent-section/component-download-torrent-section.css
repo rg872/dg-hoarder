@@ -1,0 +1,40 @@
+.topWrapper {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: var(--typography-spacing-vertical); /* from h3 margin-bottom */
+}
+
+.topWrapper > h3 {
+  flex-grow: 18;
+  margin-bottom: 0;
+}
+
+.iconButton {
+  cursor: pointer;
+}
+
+.topWrapper > .iconButton {
+  flex-grow: 1;
+}
+
+.statusAccordion {
+  margin-top: 16px;
+  margin-bottom: 0;
+  border-bottom: none;
+}
+
+.statusAccordion > summary::after {
+  background-size: 2rem auto;
+}
+
+.progressWrapper {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 8px;
+}
+
+.progressWrapper > progress {
+  margin-bottom: 0;
+}
