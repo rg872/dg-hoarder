@@ -1,0 +1,9 @@
+/* used for global style and customize pico.css */
+
+div#target > header + main {
+  padding-top: 120px;
+}
+
+.dgh-click-icon {
+  cursor: pointer;
+}

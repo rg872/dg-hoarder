@@ -1,15 +1,21 @@
-const { app, protocol, BrowserWindow, session } = require("electron");
+const { app, protocol, BrowserWindow, session, ipcMain } = require("electron");
 const Protocol = require("./protocol");
 const path = require("path");
 const isDev = process.env.NODE_ENV === "development";
 const port = 40992; // Hardcoded; needs to match webpack.development.js and package.json
 const selfHost = `http://localhost:${port}`;
 
-const ipcListeners = require("./api/ipc/listeners");
+const ipcListeners = require("./ipc/listeners");
+const { setDefaultConfig } = require("./api/appConfig");
+const { openDB, closeDB } = require("./api/sqlite");
+const { initDownloadDeps } = require("./api/download");
 
 // Keep a global reference of the window object, if you don't, the window will
 // be closed automatically when the JavaScript object is garbage collected.
 let win;
+
+// main instance of torrentClient;
+let torrentClient;
 
 async function createWindow() {
   // If you'd like to set up auto-updating for your app,
@@ -30,7 +36,6 @@ async function createWindow() {
   win = new BrowserWindow({
     width: 800,
     height: 600,
-    title: "Application is currently initializing...",
     webPreferences: {
       devTools: isDev,
       nodeIntegration: false,
@@ -47,13 +52,10 @@ async function createWindow() {
   // Load app
   if (isDev) {
     win.loadURL(selfHost);
+    win.maximize();
   } else {
     win.loadURL(`${Protocol.scheme}://rse/index.html`);
   }
-
-  win.webContents.on("did-finish-load", () => {
-    win.setTitle("DG Hoarder - File Hoarder Manager");
-  });
 
   // Only do these things when in development
   if (isDev) {
@@ -65,12 +67,20 @@ async function createWindow() {
     });
   }
 
+  // init downloadDeps and torrentClient
+  torrentClient = initDownloadDeps(win.webContents);
+
   // Emitted when the window is closed.
   win.on("closed", () => {
-    // Dereference the window object, usually you would store windows
-    // in an array if your app supports multi windows, this is the time
-    // when you should delete the corresponding element.
-    win = null;
+    // destroy torrentClient to stop event listener
+    torrentClient.destroy((err) => {
+      // TODO: add error handler and logger
+
+      // Dereference the window object, usually you would store windows
+      // in an array if your app supports multi windows, this is the time
+      // when you should delete the corresponding element.
+      win = null;
+    });
   });
 
   // https://electronjs.org/docs/tutorial/security#4-handle-session-permission-requests-from-remote-content
@@ -124,18 +134,26 @@ protocol.registerSchemesAsPrivileged([
 // initialization and is ready to create browser windows.
 // Some APIs can only be used after this event occurs.
 app.on("ready", () => {
+  // set default config
+  setDefaultConfig();
+
+  // open sqlite db
+  openDB();
+
   // invoke ipc listeners
   // dunno if listeners still work on macOS when app closed (not quit), can't test
   ipcListeners();
 
+  // create new window
   createWindow();
 });
 
 // Quit when all windows are closed.
-app.on("window-all-closed", () => {
+app.on("window-all-closed", async () => {
   // On macOS it is common for applications and their menu bar
   // to stay active until the user quits explicitly with Cmd + Q
   if (process.platform !== "darwin") {
+    await closeDB();
     app.quit();
   }
 });

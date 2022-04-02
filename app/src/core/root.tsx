@@ -1,17 +1,15 @@
 import React from "react";
 import { HashRouter } from "react-router-dom";
-import { Provider } from "react-redux";
-
-import store from "../state/store";
 
 import type Api from "./types/api";
-import type { FunctionComponent } from "react";
 
 import Navbar from "./navbar";
-import Pages from "./pages";
+import AppRoutes from "./routes";
+import { useAppDispatch } from "../hooks/redux";
+import { getAppConfig } from "../state/config/slice-config";
 
-import "@picocss/pico";
-import "./styles/root.css";
+import { HistoryRouter as Router } from "redux-first-history/rr6";
+import { history } from "../state/store";
 
 declare global {
   interface Window {
@@ -19,14 +17,16 @@ declare global {
   }
 }
 
-const Root: FunctionComponent = () => {
+const Root = () => {
+  const dispatch = useAppDispatch();
+
+  dispatch(getAppConfig());
+
   return (
-    <Provider store={store}>
-      <HashRouter>
-        <Navbar />
-        <Pages />
-      </HashRouter>
-    </Provider>
+    <Router history={history}>
+      <Navbar />
+      <AppRoutes />
+    </Router>
   );
 };
 

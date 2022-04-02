@@ -1,11 +1,11 @@
 const axios = require("axios");
 const cheerio = require("cheerio");
-const errorHandler = require("./utils/error");
+const errorHandler = require("../utils/error");
 
 const publicDomainMoviesUrl = "http://www.publicdomaintorrents.info";
 const leggitTorrentsUrl = "http://www.legittorrents.info";
 
-async function getPublicDomainMovieList() {
+async function getPublicDomainMovieList(search) {
   try {
     let result = [];
 
@@ -24,11 +24,17 @@ async function getPublicDomainMovieList() {
         `${publicDomainMoviesUrl}/${detailLinkEl.attribs["href"]}`
       );
       const movieId = detailUrl.searchParams.get("movieid");
-      result.push({
-        title: $(detailLinkEl).text().trim(),
-        id: movieId,
-        provider: "Public Domain Torrents",
-      });
+      const title = $(detailLinkEl).text().trim();
+      if (!search || title.toLowerCase().includes(search.toLowerCase())) {
+        result.push({
+          title,
+          id: movieId,
+          type: "video",
+          source: "torrent",
+          category: "movie",
+          provider: "Public Domain Torrents",
+        });
+      }
     });
 
     return { result };
@@ -54,6 +60,9 @@ async function getPublicDomainMovieDetail(id) {
     const dlLinksChe = $('a[href*=".torrent"]');
 
     result.id = `public-domain-torrents-${id}`;
+    result.type = "video";
+    result.source = "torrent";
+    result.category = "movie";
     result.provider = "Public Domain Torrents";
     result.title = titleChe.text().trim();
     result.desc = descChe.text().trim();
@@ -144,6 +153,9 @@ async function getLegitTorrentsList(params = {}) {
       result.push({
         title: $(detailLinkEl).text(),
         id: id,
+        type: "video",
+        source: "torrent",
+        category: "movie",
         provider: "Legit Torrents",
       });
     });
@@ -169,6 +181,9 @@ async function getLegitTorrentsDetail(id) {
 
     result.id = `legit-torrents-${id}`;
     result.provider = "Legit Torrents";
+    result.type = "video";
+    result.source = "torrent";
+    result.category = "movie";
 
     tdHeadersChe.each((_, tdHeaderEl) => {
       const row_title = $(tdHeaderEl).text().trim();

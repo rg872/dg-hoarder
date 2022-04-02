@@ -1,47 +1,24 @@
 import { createApi } from "@reduxjs/toolkit/query/react";
 import type { BaseQueryFn } from "@reduxjs/toolkit/dist/query";
 import type {
+  Channel,
   DiscoveredFile,
-  DiscoverParams,
-  Provider,
+  MovieParams,
+  fetchPayload,
+  MovieProvider,
   TorrentFile,
 } from "./type-discover";
 
 interface BaseQueryArgs {
-  api: "movie";
-  method: "getlist" | "getdetail";
-  provider: Provider | Provider[];
-  id?: string;
-  params?: unknown;
+  channel: Channel;
+  payload: fetchPayload;
 }
 
 const discoverApiBaseQuery =
   (): BaseQueryFn<BaseQueryArgs, unknown, unknown> =>
-  async ({ api, method, provider, params, id }) => {
+  async ({ channel, payload }) => {
     try {
-      let result;
-      if (api === "movie" && method === "getlist") {
-        if (!provider?.length)
-          throw new Error(
-            "Oops, Something wrong happen when fetching movie list"
-          );
-        result = window.api.getMovieList(
-          provider as Provider[],
-          params
-            ? (params as DiscoverParams & { category: "movie" })
-            : undefined
-        );
-      } else if (api === "movie" && method === "getdetail") {
-        if (!provider || typeof provider !== "string")
-          throw new Error(
-            "Oops, Something wrong happen when fetching movie detail"
-          );
-        if (!id || typeof id !== "string")
-          throw new Error(
-            "Oops, Something wrong happen when fetching movie detail"
-          );
-        result = window.api.getMovieDetail(provider, id);
-      }
+      const result = window.api.fileInfo(channel, payload);
       return { data: result };
     } catch (error) {
       return {
@@ -51,35 +28,37 @@ const discoverApiBaseQuery =
   };
 
 export const discoverApi = createApi({
-  reducerPath: "discover",
+  reducerPath: "discoverApi",
   baseQuery: discoverApiBaseQuery(),
   endpoints: (builder) => ({
     getMovieList: builder.query<
       DiscoveredFile[],
       {
-        provider: Provider[];
-        params?: DiscoverParams & { category: "movie" };
+        providers: MovieProvider[];
+        params: MovieParams;
       }
     >({
-      query: ({ provider, params }) => ({
-        api: "movie",
-        method: "getlist",
-        provider,
-        params,
+      query: ({ providers, params }) => ({
+        channel: "fileInfo/fetchMovieList",
+        payload: {
+          providers,
+          params,
+        },
       }),
     }),
     getMovieDetail: builder.query<
       TorrentFile,
       {
-        provider: Provider;
+        provider: MovieProvider;
         id: string;
       }
     >({
       query: ({ provider, id }) => ({
-        api: "movie",
-        method: "getdetail",
-        provider,
-        id,
+        channel: "fileInfo/fetchMovieDetail",
+        payload: {
+          provider,
+          id,
+        },
       }),
     }),
   }),
@@ -87,4 +66,9 @@ export const discoverApi = createApi({
 
 // Export hooks for usage in functional components, which are
 // auto-generated based on the defined endpoints
-export const { useGetMovieListQuery, useGetMovieDetailQuery } = discoverApi;
+export const {
+  useGetMovieListQuery,
+  useGetMovieDetailQuery,
+  useLazyGetMovieDetailQuery,
+  useLazyGetMovieListQuery,
+} = discoverApi;

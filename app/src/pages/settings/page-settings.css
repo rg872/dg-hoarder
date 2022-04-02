@@ -1,0 +1,8 @@
+.configItem {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin: calc(var(--block-spacing-vertical) / 3) 0;
+  padding: calc(var(--block-spacing-vertical) / 2)
+    var(--block-spacing-horizontal);
+}

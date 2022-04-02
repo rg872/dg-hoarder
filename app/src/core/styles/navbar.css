@@ -1,1 +1,10 @@
+.appHeader {
+  position: fixed;
+  top: 0;
+  left: 0;
+  height: 80px;
+}
 
+.navIcon {
+  cursor: pointer;
+}

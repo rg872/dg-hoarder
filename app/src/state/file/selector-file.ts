@@ -1,10 +1,13 @@
-import store from "../store";
-import { filesAdapter } from "./slice-file";
+import { createSelector } from "@reduxjs/toolkit";
+import { RootState } from "../store";
+import { fileAdapter } from "./slice-file";
 
-import type { RootState } from "../store";
-
-const filesSelectors = filesAdapter.getSelectors<RootState>(
+export const fileSelectors = fileAdapter.getSelectors<RootState>(
   (state) => state.file
 );
 
-export const allFile = filesSelectors.selectAll(store.getState());
+export const selectDownloadFiles = createSelector(
+  fileSelectors.selectAll,
+  (hoardedFiles) =>
+    hoardedFiles.filter((hFile) => hFile.downloadStatus !== "done")
+);
