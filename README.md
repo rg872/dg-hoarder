@@ -1,3 +1,3 @@
 # DG Hoarder
 
-Browse, download, organize and play your media files.
+Browse and download legal torrents
